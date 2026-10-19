@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Financiero Personal | Alejandro Romagnoli</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">💎</div>
+        <div class="brand-text">
+          <h1 id="owner-name">Alejandro Jose Romagnoli</h1>
+          <p id="meta-info">Consolidado Patrimonial • Bancos y Empresas Financieras</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Currency Selector -->
+        <div class="currency-toggle">
+          <button id="btn-ars" class="currency-btn active">ARS ($)</button>
+          <button id="btn-usd" class="currency-btn">USD (MEP)</button>
+        </div>
+
+        <!-- Refresh Button -->
+        <button id="btn-refresh" class="btn btn-secondary">
+          <span>🔄</span> Re-procesar Input
+        </button>
+
+        <!-- Download Excel -->
+        <a href="/api/download-excel" class="btn btn-primary" download>
+          <span>📥</span> Descargar Excel
+        </a>
+      </div>
+    </header>
+
+    <!-- Top KPI Cards Banner -->
+    <section class="kpi-grid">
+      <!-- 1. Total Net Worth -->
+      <div class="glass-card kpi-card highlight">
+        <div class="kpi-header">
+          <span class="kpi-title">Patrimonio Neto Total</span>
+          <span class="kpi-icon">🏛️</span>
+        </div>
+        <div class="kpi-value" id="kpi-net-worth">$ 0,00</div>
+        <div class="kpi-sub" id="kpi-net-worth-sub">Calculando...</div>
+      </div>
+
+      <!-- 2. Liquidity -->
+      <div class="glass-card kpi-card success">
+        <div class="kpi-header">
+          <span class="kpi-title">Liquidez Inmediata</span>
+          <span class="kpi-icon">💧</span>
+        </div>
+        <div class="kpi-value" id="kpi-liquidity">$ 0,00</div>
+        <div class="kpi-sub" id="kpi-liquidity-sub">Cuentas a la vista y remuneradas</div>
+      </div>
+
+      <!-- 3. Invested Assets -->
+      <div class="glass-card kpi-card warning">
+        <div class="kpi-header">
+          <span class="kpi-title">Activos Invertidos</span>
+          <span class="kpi-icon">📈</span>
+        </div>
+        <div class="kpi-value" id="kpi-invested">$ 0,00</div>
+        <div class="kpi-sub" id="kpi-invested-sub">ONs, Bonos, Plazos Fijos, CEDEARs</div>
+      </div>
+
+      <!-- 4. Yields & Interests -->
+      <div class="glass-card kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Rendimientos e Intereses</span>
+          <span class="kpi-icon">💰</span>
+        </div>
+        <div class="kpi-value" id="kpi-yields">$ 0,00</div>
+        <div class="kpi-sub">
+          <span class="badge-tag badge-success">+ Intereses 2025</span>
+        </div>
+      </div>
+
+      <!-- 5. Liabilities / Debt -->
+      <div class="glass-card kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Deuda de Tarjetas</span>
+          <span class="kpi-icon">🛡️</span>
+        </div>
+        <div class="kpi-value" id="kpi-debt">$ 0,00</div>
+        <div class="kpi-sub">
+          <span class="badge-tag badge-success">Cuentas al día</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Institution Filter Cards -->
+    <section>
+      <h2 class="section-title">🏛️ Entidades Financieras Consolidadas</h2>
+      <div class="institutions-grid" id="institutions-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Visual Charts Breakdown -->
+    <section class="charts-grid">
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <h3 style="font-size: 15px; font-weight: 700;">Distribución por Institución</h3>
+          <span class="badge-tag badge-primary">Ponderación %</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="chart-institutions"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <h3 style="font-size: 15px; font-weight: 700;">Distribución por Clase de Activo</h3>
+          <span class="badge-tag badge-info">Diversificación</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="chart-asset-classes"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs Navigation & Content -->
+    <section class="tabs-container">
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="holdings">
+          <span>📊</span> Tenencias & Portafolio 
+          <span class="tab-badge" id="badge-holdings">0</span>
+        </button>
+        <button class="tab-btn" data-tab="balances">
+          <span>💳</span> Cuentas y Saldos 
+          <span class="tab-badge" id="badge-balances">0</span>
+        </button>
+        <button class="tab-btn" data-tab="movements">
+          <span>🔄</span> Movimientos & Transacciones 
+          <span class="tab-badge" id="badge-movements">0</span>
+        </button>
+        <button class="tab-btn" data-tab="plazos-fijos">
+          <span>⏳</span> Plazos Fijos Vigentes 
+          <span class="tab-badge" id="badge-pf">0</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Holdings -->
+      <div class="tab-content active" id="tab-holdings">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-holdings" class="search-input" placeholder="Buscar por ticker, activo o entidad...">
+          </div>
+          <div>
+            <select id="filter-asset-class" class="filter-select">
+              <option value="all">Todas las clases de activo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Descripción / Especie</th>
+                <th>Clase de Activo</th>
+                <th>Institución</th>
+                <th style="text-align:right;">Cantidad</th>
+                <th style="text-align:right;">Valuación</th>
+                <th style="text-align:right;">Ponderación</th>
+              </tr>
+            </thead>
+            <tbody id="holdings-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Balances -->
+      <div class="tab-content" id="tab-balances">
+        <div class="table-responsive glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Institución</th>
+                <th>Tipo de Cuenta</th>
+                <th>Número de Cuenta / CVU</th>
+                <th style="text-align:center;">Moneda</th>
+                <th style="text-align:right;">Saldo Nominal</th>
+                <th style="text-align:right;">Valuación</th>
+              </tr>
+            </thead>
+            <tbody id="balances-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: Movements -->
+      <div class="tab-content" id="tab-movements">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-movements" class="search-input" placeholder="Buscar movimientos por concepto o categoría...">
+          </div>
+          <div>
+            <select id="filter-tx-type" class="filter-select">
+              <option value="all">Todos los tipos</option>
+              <option value="Inflow">Ingresos / Cobros (+)</option>
+              <option value="Outflow">Egresos / Pagos (-)</option>
+              <option value="Investment">Inversiones</option>
+              <option value="Yield">Rendimientos / Dividendos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Institución</th>
+                <th>Descripción / Concepto</th>
+                <th>Categoría</th>
+                <th>Tipo</th>
+                <th style="text-align:right;">Importe</th>
+              </tr>
+            </thead>
+            <tbody id="movements-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 4: Plazos Fijos -->
+      <div class="tab-content" id="tab-plazos-fijos">
+        <div class="pf-grid" id="pf-cards-grid">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>
+        <span>Consolidador Financiero Personal v2.0</span>
+      </div>
+      <div>
+        <span>Datos extraídos de resúmenes consolidados de Banco Galicia, Balanz Capital, Mercado Pago y Ualá</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <div id="dashboard-toast" class="toast"></div>
+
+  <!-- App Script -->
+  <script src="/js/app.js"></script>
+</body>
+</html>

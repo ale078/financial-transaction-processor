@@ -1,0 +1,1 @@
+"""Financial Transaction Processor package."""

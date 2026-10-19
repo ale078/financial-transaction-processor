@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+
+# Private Financial Input & Output Files (Protect sensitive bank & broker records)
+input/*
+!input/.gitkeep
+output/*
+!output/.gitkeep
+
+# System & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
