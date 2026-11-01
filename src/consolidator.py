@@ -2,27 +2,58 @@
 
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from datetime import date, datetime
+import requests
 import pandas as pd
 
 from src.models import (
     Holding, AccountBalance, Transaction, PlazoFijoItem,
     InstitutionSummary, ConsolidatedPortfolio
 )
-from src.extractors import (
-    ALL_EXTRACTORS, GaliciaExtractor, BalanzExtractor,
-    MercadoPagoExtractor, UalaExtractor
-)
+from src.extractors import ALL_EXTRACTORS
+                                                      
+                                       
+ 
 from src.classifier import TransactionClassifier
+
+
+def obtener_dolar_ccl(fecha: date | str | None = None) -> float:
+    """
+    Obtiene el valor de venta del dólar CCL para una fecha específica usando DolarAPI.
+    Si falla la API o la fecha es futura, devuelve 0.0 (fallback).
+    """
+    if fecha is None:
+        fecha = date.today()
+    elif isinstance(fecha, str):
+        try:
+            fecha = datetime.strptime(fecha, "%Y-%m-%d").date()
+        except ValueError:
+            fecha = date.today()
+
+    url = f"https://dolarapi.com/v1/dolares/contadoconliqui?fecha={fecha}"
+
+    try:
+        resp = requests.get(url, timeout=8)
+        resp.raise_for_status()
+        data = resp.json()
+        venta = float(data.get("venta", 0.0))
+        return venta if venta > 0 else 0.0
+    except Exception as e:
+        print(f"[FX] Error obteniendo dólar CCL para {fecha}: {e}")
+        return 0.0
+
 
 class PortfolioConsolidator:
     """Discovers consolidated financial statements, extracts data, and creates a unified portfolio snapshot."""
 
-    def __init__(self, input_dir: str | Path):
+    def __init__(self, input_dir: str | Path, ccl_date: date | str | None = None):
         self.input_dir = Path(input_dir)
         self.classifier = TransactionClassifier()
+        self.ccl_date = ccl_date
+        self.fx_ccl_api = 0.0   # valor real que se obtiene de la API
 
     def process(self) -> ConsolidatedPortfolio:
-        """Processes all input files and returns a unified ConsolidatedPortfolio object."""
+                                                                                           
         if not self.input_dir.exists():
             raise FileNotFoundError(f"Input directory not found: {self.input_dir}")
 
@@ -35,9 +66,27 @@ class PortfolioConsolidator:
         all_pfs: List[PlazoFijoItem] = []
         source_file_names: List[str] = []
 
+        # ==================== FX rates (hardcode fallback) ====================
         fx_mep = 1480.46
         fx_ccl = 1520.07
         total_yields_ars = 0.0
+
+        # ==================== Obtener CCL real de la API ====================
+        if self.ccl_date:
+            ccl_real = obtener_dolar_ccl(self.ccl_date)
+            if ccl_real > 0:
+                fx_ccl = ccl_real
+                self.fx_ccl_api = ccl_real
+                print(f"[FX] Dólar CCL obtenido de API para {self.ccl_date}: {fx_ccl}")
+            else:
+                print(f"[FX] Usando valor fallback {fx_ccl} para {self.ccl_date}")
+        else:
+            # Si no se especifica fecha → usar hoy
+            ccl_real = obtener_dolar_ccl()
+            if ccl_real > 0:
+                fx_ccl = ccl_real
+                self.fx_ccl_api = ccl_real
+                print(f"[FX] Dólar CCL obtenido de API para hoy: {fx_ccl}")
 
         for file_path in supported_files:
             matched_extractor_cls = None
@@ -57,7 +106,7 @@ class PortfolioConsolidator:
                 data = extractor.extract()
                 source_file_names.append(file_path.name)
 
-                # Capture FX rates if available
+                # Capture FX rates from extractors (si vienen en los extractores)
                 if "fx_mep" in data and data["fx_mep"]:
                     fx_mep = float(data["fx_mep"])
                 if "fx_ccl" in data and data["fx_ccl"]:
@@ -68,6 +117,8 @@ class PortfolioConsolidator:
                     extra = data["extra"]
                     if "total_intereses_ganados" in extra:
                         total_yields_ars += float(extra["total_intereses_ganados"])
+                    elif "total_interestes_ganados" in extra:
+                        total_yields_ars += float(extra["total_interestes_ganados"])
                     if "rendimientos_2025" in extra:
                         total_yields_ars += float(extra["rendimientos_2025"])
 
@@ -76,28 +127,28 @@ class PortfolioConsolidator:
                     for pf in data["plazos_fijos"]:
                         all_pfs.append(PlazoFijoItem(
                             number=pf["number"],
-                            start_date=pf["start_date"],
-                            end_date=pf["end_date"],
-                            capital=pf["capital"],
-                            rate_tna=pf["rate_tna"],
-                            accrued_amount=pf["accrued_amount"],
-                            maturity_amount=pf["maturity_amount"],
+                            start_date=pf.get("start_date", ""),
+                            end_date=pf.get("end_date", ""),
+                            capital=float(pf.get("capital", 0.0)),
+                            rate_tna=float(pf.get("rate_tna", 0.0)),
+                            accrued_amount=float(pf.get("accrued_amount", 0.0)),
+                            maturity_amount=float(pf.get("maturity_amount", 0.0)),
                             status=pf.get("status", "Vigente")
                         ))
 
-                # Holdings
+                          
                 all_holdings_raw.extend(data.get("holdings", []))
 
-                # Balances
+                          
                 all_balances_raw.extend(data.get("balances", []))
 
-                # Transactions
+                              
                 all_tx_raw.extend(data.get("transactions", []))
 
             except Exception as e:
                 print(f"[CONSOLIDATOR ERROR] Could not process {file_path.name}: {e}")
 
-        # Compute Holdings
+        # ==================== Holdings ====================
         holdings_list: List[Holding] = []
         for h in all_holdings_raw:
             val_ars = float(h.get("total_value_ars", 0.0))
@@ -112,23 +163,24 @@ class PortfolioConsolidator:
                 institution=h.get("institution", "Desconocido"),
                 quantity=float(h.get("quantity", 1.0)),
                 currency=h.get("currency", "ARS"),
-                unit_price=float(h.get("unit_price", 0.0)),
+                unit_price=float(h.get("input_price", 0.0)),
                 total_value_ars=val_ars,
                 total_value_usd=val_usd,
                 account_id=h.get("account_id"),
                 extra_info=h.get("extra_info", {})
             ))
 
-        # Sort holdings by valuation descending
+                                               
         holdings_list.sort(key=lambda x: x.total_value_ars, reverse=True)
 
-        # Compute Balances
+        # ==================== Balances ====================
         balances_list: List[AccountBalance] = []
         for b in all_balances_raw:
             b_ars = float(b.get("balance_ars", 0.0))
             b_usd = float(b.get("balance_usd", 0.0))
             if b_usd == 0.0 and fx_mep > 0 and b_ars > 0:
                 b_usd = round(b_ars / fx_mep, 2)
+
             balances_list.append(AccountBalance(
                 institution=b.get("institution", ""),
                 account_type=b.get("account_type", ""),
@@ -139,7 +191,7 @@ class PortfolioConsolidator:
                 balance_usd=b_usd
             ))
 
-        # Compute Transactions with Classification
+        # ==================== Transactions ====================
         tx_list: List[Transaction] = []
         for t in all_tx_raw:
             amt = float(t.get("amount", 0.0))
@@ -164,24 +216,24 @@ class PortfolioConsolidator:
                 source_file=t.get("source_file", "")
             ))
 
-        # Sort transactions chronologically
+                                           
         tx_list.sort(key=lambda x: x.date, reverse=True)
 
-        # Portfolio Aggregations
+        # ==================== Aggregations ====================
         total_ars = sum(h.total_value_ars for h in holdings_list)
-        total_usd = round(total_ars / fx_mep, 2) if fx_mep else 0.0
+        total_usd = round(total_ars / fx_mep, 2) if fx_mep > 0 else 0.0
 
-        # Assign weights
+                        
         for h in holdings_list:
-            h.weight_pct = round((h.total_value_ars / total_ars) * 100, 2) if total_ars else 0.0
+            h.weight_pct = round((h.total_value_ars / total_ars) * 100, 2) if total_ars > 0 else 0.0
 
-        # Breakdowns by Asset Class
+        # Asset Classes breakdown
         asset_classes: Dict[str, float] = {}
         for h in holdings_list:
             ac = h.asset_class
             asset_classes[ac] = round(asset_classes.get(ac, 0.0) + h.total_value_ars, 2)
 
-        # Breakdowns by Institution
+        # Institutions breakdown
         inst_groups: Dict[str, List[Holding]] = {}
         for h in holdings_list:
             inst_groups.setdefault(h.institution, []).append(h)
@@ -189,12 +241,13 @@ class PortfolioConsolidator:
         institutions_summary: Dict[str, InstitutionSummary] = {}
         for inst_name, inst_holdings in inst_groups.items():
             inst_ars = sum(h.total_value_ars for h in inst_holdings)
-            inst_usd = round(inst_ars / fx_mep, 2) if fx_mep else 0.0
-            inst_share = round((inst_ars / total_ars) * 100, 2) if total_ars else 0.0
+            inst_usd = round(inst_ars / fx_mep, 2) if fx_mep > 0 else 0.0
+            inst_share = round((inst_ars / total_ars) * 100, 2) if total_ars > 0 else 0.0
 
             liquidity_ars = sum(h.total_value_ars for h in inst_holdings if h.asset_class in ["Dinero a la vista", "Liquidez Remunerada", "Reservas"])
             invested_ars = inst_ars - liquidity_ars
 
+        # Asset class breakdown per institution
             ac_breakdown: Dict[str, float] = {}
             for h in inst_holdings:
                 ac_breakdown[h.asset_class] = round(ac_breakdown.get(h.asset_class, 0.0) + h.total_value_ars, 2)
@@ -204,8 +257,8 @@ class PortfolioConsolidator:
                 total_ars=round(inst_ars, 2),
                 total_usd=inst_usd,
                 share_pct=inst_share,
-                liquidity_ars=round(liquidity_ars, 2),
-                invested_ars=round(invested_ars, 2),
+                liquidity_ars=round(0, 2),
+                invested_ars=round(0, 2),
                 asset_classes_breakdown=ac_breakdown,
                 holdings_count=len(inst_holdings)
             )
@@ -257,7 +310,7 @@ class PortfolioConsolidator:
                     "asset_classes_breakdown": s.asset_classes_breakdown,
                     "holdings_count": s.holdings_count
                 }
-                for name, s in portfolio.institutions.items()
+            for name, s in portfolio.institutions.items()
             },
             "asset_classes": portfolio.asset_classes,
             "holdings": [
@@ -280,14 +333,14 @@ class PortfolioConsolidator:
             "balances": [
                 {
                     "institution": b.institution,
-                    "account_type": b.account_type,
-                    "account_number": b.account_number,
-                    "currency": b.currency,
-                    "balance": b.balance,
-                    "balance_ars": b.balance_ars,
-                    "balance_usd": b.balance_usd
-                }
-                for b in portfolio.balances
+                "account_type": b.account_type,
+                "account_number": b.account_number,
+                "currency": b.currency,
+                "balance": b.balance,
+                "balance_ars": b.balance_ars,
+                "balance_usd": b.balance_usd
+            }
+            for b in portfolio.balances
             ],
             "transactions": [
                 {

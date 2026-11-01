@@ -3,114 +3,387 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Financiero Personal | Alejandro Romagnoli</title>
+  <title>Patrimonio Consolidado Argentino | Alejandro Romagnoli</title>
   
-  <!-- Modern Typography -->
+  <!-- Modern Typography: Outfit & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   
-  <!-- Custom Stylesheet -->
+  <!-- Custom Stylesheet with Argentine Visual Theme -->
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
 
+  <!-- Background Watermark: Sutil Sol de Mayo ornamental -->
+  <div class="arg-watermark" aria-hidden="true"></div>
+
+  <!-- Top Ticker Bar: Mercado Financiero Argentino en Vivo -->
+  <header class="market-ticker-banner">
+    <div class="ticker-inner">
+      <div class="ticker-badge">
+        <span class="escarapela-mini"></span>
+        <span class="ticker-badge-text">MERCADO ARGENTINO</span>
+      </div>
+      <div class="ticker-scroll">
+        <div class="ticker-item">
+          <span class="ticker-label">DÓLAR MEP:</span>
+          <span class="ticker-val" id="ticker-mep">$ 1.480,46</span>
+          <span class="ticker-trend up">▲ Balanz</span>
+        </div>
+        <div class="ticker-divider">•</div>
+        <div class="ticker-item">
+          <span class="ticker-label">DÓLAR CCL:</span>
+          <span class="ticker-val" id="ticker-ccl">$ 1.520,07</span>
+          <span class="ticker-trend up">▲ BCBA</span>
+        </div>
+        <div class="ticker-divider">•</div>
+        <div class="ticker-item">
+          <span class="ticker-label">TNA PLAZO FIJO:</span>
+          <span class="ticker-val">37,00%</span>
+          <span class="ticker-tag-bcra">BCRA REF</span>
+        </div>
+        <div class="ticker-divider">•</div>
+        <div class="ticker-item">
+          <span class="ticker-label">S&P MERVAL:</span>
+          <span class="ticker-val">1.854.310 pts</span>
+          <span class="ticker-trend up">+1,8%</span>
+        </div>
+        <div class="ticker-divider">•</div>
+        <div class="ticker-item">
+          <span class="ticker-label">RIESGO PAÍS:</span>
+          <span class="ticker-val">894 pb</span>
+          <span class="ticker-trend down">▼ -12 pb</span>
+        </div>
+        <div class="ticker-divider">•</div>
+        <div class="ticker-item">
+          <span class="ticker-label">AL30D:</span>
+          <span class="ticker-val">USD 68,40</span>
+          <span class="ticker-trend up">+0,6%</span>
+        </div>
+      </div>
+      <div class="ticker-status">
+        <span class="pulse-dot"></span>
+        <span class="status-text">EN VIVO</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Fileteado Porteño: Marco Ornamental en las Cuatro Esquinas -->
+  <div class="fileteado-frame" aria-hidden="true">
+    <!-- Esquina Superior Izquierda -->
+    <svg class="fileteado-corner fc-tl" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fGradTL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFB81C" stop-opacity="0.9"/>
+          <stop offset="50%" stop-color="#74ACDF" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#FFB81C" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+      <!-- Líneas de borde en L -->
+      <path d="M 8 8 L 8 70" stroke="url(#fGradTL)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M 8 8 L 70 8" stroke="url(#fGradTL)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Segunda línea interior en L -->
+      <path d="M 15 15 L 15 55" stroke="#FFB81C" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.5"/>
+      <path d="M 15 15 L 55 15" stroke="#FFB81C" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.5"/>
+      <!-- Rosetón de esquina: círculo central con pétalos -->
+      <circle cx="8" cy="8" r="5" fill="#FFB81C" opacity="0.9"/>
+      <circle cx="8" cy="8" r="3" fill="#FFFFFF" opacity="0.8"/>
+      <!-- Flor fileteada en vértice -->
+      <g transform="translate(22,22)" fill="none" stroke="#FFB81C" stroke-width="1.2" opacity="0.85">
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(0)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(45)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(90)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(135)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(180)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(225)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(270)"/>
+        <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(315)"/>
+        <circle r="4" fill="#FFB81C" opacity="0.9" stroke="none"/>
+        <circle r="2" fill="#FFFFFF" opacity="0.9" stroke="none"/>
+      </g>
+      <!-- Zarcillos y volutas -->
+      <path d="M 8 35 Q 14 38 12 45 Q 10 52 17 55 Q 24 58 22 65" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+      <path d="M 35 8 Q 38 14 45 12 Q 52 10 55 17 Q 58 24 65 22" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+      <!-- Hoja derecha superior -->
+      <path d="M 42 8 Q 50 18 44 28 Q 38 18 42 8 Z" fill="#FFB81C" opacity="0.5"/>
+      <!-- Hoja izquierda lateral -->
+      <path d="M 8 42 Q 18 50 28 44 Q 18 38 8 42 Z" fill="#FFB81C" opacity="0.5"/>
+      <!-- Puntitos decorativos -->
+      <circle cx="30" cy="8" r="1.5" fill="#74ACDF" opacity="0.7"/>
+      <circle cx="55" cy="8" r="1.5" fill="#FFB81C" opacity="0.7"/>
+      <circle cx="8" cy="30" r="1.5" fill="#74ACDF" opacity="0.7"/>
+      <circle cx="8" cy="55" r="1.5" fill="#FFB81C" opacity="0.7"/>
+    </svg>
+
+    <!-- Esquina Superior Derecha (espejo horizontal) -->
+    <svg class="fileteado-corner fc-tr" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fGradTR" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FFB81C" stop-opacity="0.9"/>
+          <stop offset="50%" stop-color="#74ACDF" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#FFB81C" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+      <g transform="scale(-1,1) translate(-160,0)">
+        <path d="M 8 8 L 8 70" stroke="url(#fGradTR)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 8 8 L 70 8" stroke="url(#fGradTR)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 15 15 L 15 55" stroke="#FFB81C" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+        <path d="M 15 15 L 55 15" stroke="#FFB81C" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+        <circle cx="8" cy="8" r="5" fill="#FFB81C" opacity="0.9"/>
+        <circle cx="8" cy="8" r="3" fill="#FFFFFF" opacity="0.8"/>
+        <g transform="translate(22,22)" fill="none" stroke="#FFB81C" stroke-width="1.2" opacity="0.85">
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(0)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(45)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(90)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(135)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(225)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(270)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(315)"/>
+          <circle r="4" fill="#FFB81C" opacity="0.9" stroke="none"/>
+          <circle r="2" fill="#FFFFFF" opacity="0.9" stroke="none"/>
+        </g>
+        <path d="M 8 35 Q 14 38 12 45 Q 10 52 17 55 Q 24 58 22 65" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <path d="M 35 8 Q 38 14 45 12 Q 52 10 55 17 Q 58 24 65 22" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <path d="M 42 8 Q 50 18 44 28 Q 38 18 42 8 Z" fill="#FFB81C" opacity="0.5"/>
+        <path d="M 8 42 Q 18 50 28 44 Q 18 38 8 42 Z" fill="#FFB81C" opacity="0.5"/>
+        <circle cx="30" cy="8" r="1.5" fill="#74ACDF" opacity="0.7"/>
+        <circle cx="55" cy="8" r="1.5" fill="#FFB81C" opacity="0.7"/>
+        <circle cx="8" cy="30" r="1.5" fill="#74ACDF" opacity="0.7"/>
+        <circle cx="8" cy="55" r="1.5" fill="#FFB81C" opacity="0.7"/>
+      </g>
+    </svg>
+
+    <!-- Esquina Inferior Izquierda (espejo vertical) -->
+    <svg class="fileteado-corner fc-bl" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fGradBL" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#FFB81C" stop-opacity="0.9"/>
+          <stop offset="50%" stop-color="#74ACDF" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#FFB81C" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+      <g transform="scale(1,-1) translate(0,-160)">
+        <path d="M 8 8 L 8 70" stroke="url(#fGradBL)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 8 8 L 70 8" stroke="url(#fGradBL)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 15 15 L 15 55" stroke="#FFB81C" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+        <path d="M 15 15 L 55 15" stroke="#FFB81C" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+        <circle cx="8" cy="8" r="5" fill="#FFB81C" opacity="0.9"/>
+        <circle cx="8" cy="8" r="3" fill="#FFFFFF" opacity="0.8"/>
+        <g transform="translate(22,22)" fill="none" stroke="#FFB81C" stroke-width="1.2" opacity="0.85">
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(0)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(45)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(90)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(135)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(225)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(270)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(315)"/>
+          <circle r="4" fill="#FFB81C" opacity="0.9" stroke="none"/>
+          <circle r="2" fill="#FFFFFF" opacity="0.9" stroke="none"/>
+        </g>
+        <path d="M 8 35 Q 14 38 12 45 Q 10 52 17 55 Q 24 58 22 65" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <path d="M 35 8 Q 38 14 45 12 Q 52 10 55 17 Q 58 24 65 22" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <path d="M 42 8 Q 50 18 44 28 Q 38 18 42 8 Z" fill="#FFB81C" opacity="0.5"/>
+        <path d="M 8 42 Q 18 50 28 44 Q 18 38 8 42 Z" fill="#FFB81C" opacity="0.5"/>
+        <circle cx="30" cy="8" r="1.5" fill="#74ACDF" opacity="0.7"/>
+        <circle cx="55" cy="8" r="1.5" fill="#FFB81C" opacity="0.7"/>
+        <circle cx="8" cy="30" r="1.5" fill="#74ACDF" opacity="0.7"/>
+        <circle cx="8" cy="55" r="1.5" fill="#FFB81C" opacity="0.7"/>
+      </g>
+    </svg>
+
+    <!-- Esquina Inferior Derecha (espejo ambos ejes) -->
+    <svg class="fileteado-corner fc-br" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fGradBR" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#FFB81C" stop-opacity="0.9"/>
+          <stop offset="50%" stop-color="#74ACDF" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#FFB81C" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+      <g transform="scale(-1,-1) translate(-160,-160)">
+        <path d="M 8 8 L 8 70" stroke="url(#fGradBR)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 8 8 L 70 8" stroke="url(#fGradBR)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 15 15 L 15 55" stroke="#FFB81C" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+        <path d="M 15 15 L 55 15" stroke="#FFB81C" stroke-width="1" fill="none" opacity="0.5" stroke-linecap="round"/>
+        <circle cx="8" cy="8" r="5" fill="#FFB81C" opacity="0.9"/>
+        <circle cx="8" cy="8" r="3" fill="#FFFFFF" opacity="0.8"/>
+        <g transform="translate(22,22)" fill="none" stroke="#FFB81C" stroke-width="1.2" opacity="0.85">
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(0)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(45)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(90)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(135)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(225)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(270)"/>
+          <ellipse cx="0" cy="-10" rx="3.5" ry="6" transform="rotate(315)"/>
+          <circle r="4" fill="#FFB81C" opacity="0.9" stroke="none"/>
+          <circle r="2" fill="#FFFFFF" opacity="0.9" stroke="none"/>
+        </g>
+        <path d="M 8 35 Q 14 38 12 45 Q 10 52 17 55 Q 24 58 22 65" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <path d="M 35 8 Q 38 14 45 12 Q 52 10 55 17 Q 58 24 65 22" stroke="#74ACDF" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+        <path d="M 42 8 Q 50 18 44 28 Q 38 18 42 8 Z" fill="#FFB81C" opacity="0.5"/>
+        <path d="M 8 42 Q 18 50 28 44 Q 18 38 8 42 Z" fill="#FFB81C" opacity="0.5"/>
+        <circle cx="30" cy="8" r="1.5" fill="#74ACDF" opacity="0.7"/>
+        <circle cx="55" cy="8" r="1.5" fill="#FFB81C" opacity="0.7"/>
+        <circle cx="8" cy="30" r="1.5" fill="#74ACDF" opacity="0.7"/>
+        <circle cx="8" cy="55" r="1.5" fill="#FFB81C" opacity="0.7"/>
+      </g>
+    </svg>
+  </div>
+
   <div class="dashboard-container">
     
-    <!-- Header -->
+    <!-- Header Principal -->
     <header class="header">
       <div class="brand">
-        <div class="brand-icon">💎</div>
+        <div class="brand-badge-container">
+          <!-- Sol de Mayo Oficial de la Bandera Argentina -->
+          <div class="sol-de-mayo-box" title="Sol de Mayo Oficial de la República Argentina">
+            <img src="/img/sol_de_mayo.svg" alt="Sol de Mayo Oficial Argentino" class="sol-official-img">
+          </div>
+        </div>
+
         <div class="brand-text">
+          <div class="brand-meta-pill">
+            <span class="flag-pill">🇦🇷 REPÚBLICA ARGENTINA</span>
+            <span class="pill-dot">•</span>
+            <span class="pill-sub">SISTEMA FINANCIERO INTEGRADO</span>
+            <span class="badge-patrio">CNV • BCRA</span>
+          </div>
           <h1 id="owner-name">Alejandro Jose Romagnoli</h1>
-          <p id="meta-info">Consolidado Patrimonial • Bancos y Empresas Financieras</p>
+          <p id="meta-info">Consolidado Patrimonial Multidivisa • Balanz Capital, Banco Galicia, Mercado Pago y Ualá</p>
         </div>
       </div>
 
       <div class="header-actions">
         <!-- Currency Selector -->
-        <div class="currency-toggle">
-          <button id="btn-ars" class="currency-btn active">ARS ($)</button>
-          <button id="btn-usd" class="currency-btn">USD (MEP)</button>
+        <div class="currency-toggle-wrapper">
+          <span class="toggle-caption">VALUACIÓN:</span>
+          <div class="currency-toggle">
+            <button id="btn-ars" class="currency-btn active" title="Valuación en Pesos Argentinos">
+              <span class="btn-flag">🇦🇷</span>
+              <span>ARS ($)</span>
+            </button>
+            <button id="btn-usd" class="currency-btn" title="Valuación en Dólar MEP (Bolsa)">
+              <span class="btn-flag">💵</span>
+              <span>USD (MEP)</span>
+            </button>
+          </div>
         </div>
 
         <!-- Refresh Button -->
-        <button id="btn-refresh" class="btn btn-secondary">
+        <button id="btn-refresh" class="btn btn-secondary" title="Re-escanear comprobantes y extractos bancarios">
           <span>🔄</span> Re-procesar Input
         </button>
 
         <!-- Download Excel -->
-        <a href="/api/download-excel" class="btn btn-primary" download>
-          <span>📥</span> Descargar Excel
+        <a href="/api/download-excel" class="btn btn-primary" download title="Descargar auditoría completa en Excel">
+          <span class="btn-icon">📥</span> Descargar Excel
         </a>
       </div>
     </header>
 
-    <!-- Top KPI Cards Banner -->
+    <!-- Top KPI Cards Banner (Diseño Albiceleste & Oro Solar) -->
     <section class="kpi-grid">
       <!-- 1. Total Net Worth -->
-      <div class="glass-card kpi-card highlight">
+      <div class="glass-card kpi-card kpi-patrimonio highlight-cielo">
+        <div class="kpi-badge-top">
+          <span class="escarapela-dot"></span>
+          <span>VALOR INTEGRAL</span>
+        </div>
         <div class="kpi-header">
-          <span class="kpi-title">Patrimonio Neto Total</span>
+          <span class="kpi-title">Patrimonio Neto Consolidado</span>
           <span class="kpi-icon">🏛️</span>
         </div>
-        <div class="kpi-value" id="kpi-net-worth">$ 0,00</div>
-        <div class="kpi-sub" id="kpi-net-worth-sub">Calculando...</div>
+        <div class="kpi-value highlight-num" id="kpi-net-worth">$ 0,00</div>
+        <div class="kpi-sub" id="kpi-net-worth-sub">Calculando equivalencia...</div>
       </div>
 
       <!-- 2. Liquidity -->
-      <div class="glass-card kpi-card success">
+      <div class="glass-card kpi-card kpi-liquidez">
+        <div class="kpi-badge-top">
+          <span class="status-dot-green"></span>
+          <span>DISPONIBILIDAD INMEDIATA</span>
+        </div>
         <div class="kpi-header">
-          <span class="kpi-title">Liquidez Inmediata</span>
+          <span class="kpi-title">Liquidez & Remuneradas</span>
           <span class="kpi-icon">💧</span>
         </div>
-        <div class="kpi-value" id="kpi-liquidity">$ 0,00</div>
-        <div class="kpi-sub" id="kpi-liquidity-sub">Cuentas a la vista y remuneradas</div>
+        <div class="kpi-value text-cielo" id="kpi-liquidity">$ 0,00</div>
+        <div class="kpi-sub" id="kpi-liquidity-sub">Cuentas bancarias y billeteras CVU</div>
       </div>
 
       <!-- 3. Invested Assets -->
-      <div class="glass-card kpi-card warning">
+      <div class="glass-card kpi-card kpi-inversiones">
+        <div class="kpi-badge-top">
+          <span class="status-dot-blue"></span>
+          <span>PORTAFOLIO DE INVERSIÓN</span>
+        </div>
         <div class="kpi-header">
-          <span class="kpi-title">Activos Invertidos</span>
+          <span class="kpi-title">Activos & Títulos Valores</span>
           <span class="kpi-icon">📈</span>
         </div>
-        <div class="kpi-value" id="kpi-invested">$ 0,00</div>
-        <div class="kpi-sub" id="kpi-invested-sub">ONs, Bonos, Plazos Fijos, CEDEARs</div>
+        <div class="kpi-value text-amber" id="kpi-invested">$ 0,00</div>
+        <div class="kpi-sub" id="kpi-invested-sub">ONs, Bonos Soberanos, PFs y CEDEARs</div>
       </div>
 
       <!-- 4. Yields & Interests -->
-      <div class="glass-card kpi-card">
+      <div class="glass-card kpi-card kpi-rendimientos highlight-oro">
+        <div class="kpi-badge-top">
+          <span class="status-dot-gold"></span>
+          <span>RENTABILIDAD GENERADA</span>
+        </div>
         <div class="kpi-header">
           <span class="kpi-title">Rendimientos e Intereses</span>
-          <span class="kpi-icon">💰</span>
+          <span class="kpi-icon">☀️</span>
         </div>
-        <div class="kpi-value" id="kpi-yields">$ 0,00</div>
+        <div class="kpi-value text-gold" id="kpi-yields">$ 0,00</div>
         <div class="kpi-sub">
-          <span class="badge-tag badge-success">+ Intereses 2025</span>
+          <span class="badge-tag badge-gold">+ Renta Fija y Remunerada 2025</span>
         </div>
       </div>
 
       <!-- 5. Liabilities / Debt -->
-      <div class="glass-card kpi-card">
+      <div class="glass-card kpi-card kpi-deuda">
+        <div class="kpi-badge-top">
+          <span class="status-dot-green"></span>
+          <span>ESTADO CREDITICIO</span>
+        </div>
         <div class="kpi-header">
-          <span class="kpi-title">Deuda de Tarjetas</span>
+          <span class="kpi-title">Pasivos & Tarjetas</span>
           <span class="kpi-icon">🛡️</span>
         </div>
-        <div class="kpi-value" id="kpi-debt">$ 0,00</div>
+        <div class="kpi-value text-green" id="kpi-debt">$ 0,00</div>
         <div class="kpi-sub">
-          <span class="badge-tag badge-success">Cuentas al día</span>
+          <span class="badge-tag badge-success">✓ Sin saldos pendientes / Al día</span>
         </div>
       </div>
     </section>
 
-    <!-- Institution Filter Cards -->
-    <section>
-      <h2 class="section-title">🏛️ Entidades Financieras Consolidadas</h2>
+    <!-- Institution Filter Cards (Identidad de Marca Oficial) -->
+    <section class="section-container">
+      <div class="section-header-bar">
+        <div>
+          <h2 class="section-title">
+            <span class="section-icon">🏛️</span>
+            <span>Entidades Financieras Argentinas</span>
+          </h2>
+          <p class="section-desc">Selecciona una entidad para filtrar instantáneamente tenencias, saldos y operaciones</p>
+        </div>
+        <div class="section-actions">
+          <button id="btn-clear-inst" class="chip-reset" style="display:none;" onclick="resetInstitutionFilter()">
+            ✕ Mostrar Todas
+          </button>
+        </div>
+      </div>
       <div class="institutions-grid" id="institutions-grid">
-        <!-- Rendered dynamically -->
+        <!-- Rendered dynamically con estilos de Balanz, Galicia, MP y Ualá -->
       </div>
     </section>
 
@@ -118,8 +391,11 @@
     <section class="charts-grid">
       <div class="glass-card chart-card">
         <div class="chart-header">
-          <h3 style="font-size: 15px; font-weight: 700;">Distribución por Institución</h3>
-          <span class="badge-tag badge-primary">Ponderación %</span>
+          <div>
+            <h3 class="chart-title">Distribución por Institución Financiera</h3>
+            <p class="chart-subtitle">Ponderación de capital en bancos, brokers y billeteras</p>
+          </div>
+          <span class="badge-tag badge-cielo">Ponderación %</span>
         </div>
         <div class="chart-wrapper">
           <canvas id="chart-institutions"></canvas>
@@ -128,8 +404,11 @@
 
       <div class="glass-card chart-card">
         <div class="chart-header">
-          <h3 style="font-size: 15px; font-weight: 700;">Distribución por Clase de Activo</h3>
-          <span class="badge-tag badge-info">Diversificación</span>
+          <div>
+            <h3 class="chart-title">Composición por Instrumento & Activo</h3>
+            <p class="chart-subtitle">Diversificación en ONs, Bonos, Plazos Fijos, CEDEARs y Liquidez</p>
+          </div>
+          <span class="badge-tag badge-gold">Estrategia</span>
         </div>
         <div class="chart-wrapper">
           <canvas id="chart-asset-classes"></canvas>
@@ -141,29 +420,51 @@
     <section class="tabs-container">
       <div class="tabs-nav">
         <button class="tab-btn active" data-tab="holdings">
-          <span>📊</span> Tenencias & Portafolio 
+          <span class="tab-icon">📊</span>
+          <span>Tenencias & Portafolio</span>
           <span class="tab-badge" id="badge-holdings">0</span>
         </button>
         <button class="tab-btn" data-tab="balances">
-          <span>💳</span> Cuentas y Saldos 
+          <span class="tab-icon">💳</span>
+          <span>Cuentas y Saldos (CBU/CVU)</span>
           <span class="tab-badge" id="badge-balances">0</span>
         </button>
         <button class="tab-btn" data-tab="movements">
-          <span>🔄</span> Movimientos & Transacciones 
+          <span class="tab-icon">🔄</span>
+          <span>Movimientos & Transacciones</span>
           <span class="tab-badge" id="badge-movements">0</span>
         </button>
         <button class="tab-btn" data-tab="plazos-fijos">
-          <span>⏳</span> Plazos Fijos Vigentes 
+          <span class="tab-icon">⏳</span>
+          <span>Certificados de Plazo Fijo</span>
           <span class="tab-badge" id="badge-pf">0</span>
+        </button>
+        <button class="tab-btn" data-tab="cedears">
+          <span class="tab-icon">📈</span>
+          <span>CEDEARs & Mercado en Vivo</span>
+          <span class="tab-badge" id="badge-cedears">0</span>
         </button>
       </div>
 
       <!-- Tab 1: Holdings -->
       <div class="tab-content active" id="tab-holdings">
+        <!-- Quick Filter Chips -->
+        <div class="quick-filter-chips" id="quick-filter-chips">
+          <span class="chips-title">Filtrar por clase:</span>
+          <button class="chip active" data-class="all">Todos los Activos</button>
+          <button class="chip" data-class="Corporativos / ON">ONs en Dólares</button>
+          <button class="chip" data-class="Bonos Soberanos">Bonos Soberanos</button>
+          <button class="chip" data-class="Cedears">CEDEARs</button>
+          <button class="chip" data-class="Acciones">Acciones Locales</button>
+          <button class="chip" data-class="Plazos Fijos">Plazos Fijos</button>
+          <button class="chip" data-class="Fondos Comunes">FCIs</button>
+          <button class="chip" data-class="Liquidez">Liquidez</button>
+        </div>
+
         <div class="toolbar">
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search-holdings" class="search-input" placeholder="Buscar por ticker, activo o entidad...">
+            <input type="text" id="search-holdings" class="search-input" placeholder="Buscar por ticker (ej: YCA6O, AL30), descripción o entidad...">
           </div>
           <div>
             <select id="filter-asset-class" class="filter-select">
@@ -176,11 +477,11 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Descripción / Especie</th>
+                <th>Ticker / Símbolo</th>
+                <th>Especie / Descripción</th>
                 <th>Clase de Activo</th>
-                <th>Institución</th>
-                <th style="text-align:right;">Cantidad</th>
+                <th>Institución / Custodio</th>
+                <th style="text-align:right;">Cantidad Nominal</th>
                 <th style="text-align:right;">Valuación</th>
                 <th style="text-align:right;">Ponderación</th>
               </tr>
@@ -198,9 +499,9 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Institución</th>
+                <th>Institución Financiera</th>
                 <th>Tipo de Cuenta</th>
-                <th>Número de Cuenta / CVU</th>
+                <th>Número de Cuenta / CVU / CBU</th>
                 <th style="text-align:center;">Moneda</th>
                 <th style="text-align:right;">Saldo Nominal</th>
                 <th style="text-align:right;">Valuación</th>
@@ -218,15 +519,15 @@
         <div class="toolbar">
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search-movements" class="search-input" placeholder="Buscar movimientos por concepto o categoría...">
+            <input type="text" id="search-movements" class="search-input" placeholder="Buscar movimientos por concepto, transferencia o comercio...">
           </div>
           <div>
             <select id="filter-tx-type" class="filter-select">
-              <option value="all">Todos los tipos</option>
+              <option value="all">Todos los tipos de operación</option>
               <option value="Inflow">Ingresos / Cobros (+)</option>
               <option value="Outflow">Egresos / Pagos (-)</option>
-              <option value="Investment">Inversiones</option>
-              <option value="Yield">Rendimientos / Dividendos</option>
+              <option value="Investment">Inversiones & Compras</option>
+              <option value="Yield">Rendimientos e Intereses</option>
             </select>
           </div>
         </div>
@@ -236,8 +537,8 @@
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Institución</th>
-                <th>Descripción / Concepto</th>
+                <th>Entidad</th>
+                <th>Detalle de Operación / Comercio</th>
                 <th>Categoría</th>
                 <th>Tipo</th>
                 <th style="text-align:right;">Importe</th>
@@ -252,19 +553,130 @@
 
       <!-- Tab 4: Plazos Fijos -->
       <div class="tab-content" id="tab-plazos-fijos">
+        <div class="pf-banner-info glass-card">
+          <div class="pf-banner-icon">🏛️</div>
+          <div class="pf-banner-text">
+            <h4>Depósitos a Plazo Fijo en Moneda Nacional (Ley 24.485)</h4>
+            <p>Monitoreo de certificados vigentes con cálculo de interés diario devengado y valor neto al vencimiento garantizado.</p>
+          </div>
+        </div>
         <div class="pf-grid" id="pf-cards-grid">
           <!-- Rendered dynamically -->
         </div>
       </div>
+
+      <!-- Tab 5: CEDEARs & Mercado en Vivo -->
+      <div class="tab-content" id="tab-cedears">
+        <div class="cedear-hero-banner glass-card">
+          <div class="cedear-hero-info">
+            <div class="cedear-hero-icon">📈</div>
+            <div>
+              <div class="cedear-hero-title-row">
+                <h4>CEDEARs en Cartera & Cotizaciones BYMA en Tiempo Real</h4>
+                <span class="badge badge-gold" id="cedears-live-status">BYMA / Yahoo Finance</span>
+              </div>
+              <p>Monitoreo de certificados de depósito de acciones extranjeras. Compara el valor original de tus boletos de compra/custodia contra el último precio de mercado operado en la Bolsa de Comercio de Buenos Aires.</p>
+            </div>
+          </div>
+          <div class="cedear-hero-actions">
+            <button class="btn btn-secondary" id="btn-refresh-cedears">
+              <span class="btn-icon">⚡</span>
+              <span>Actualizar Precios</span>
+            </button>
+            <span class="cedear-last-sync" id="cedears-last-sync">Cargando cotizaciones...</span>
+          </div>
+        </div>
+
+        <!-- KPI Mini Cards for CEDEARs -->
+        <div class="cedears-kpis-grid">
+          <div class="cedear-kpi-card glass-card">
+            <span class="kpi-label">Valuación en Mercado (Vivo)</span>
+            <span class="cedear-kpi-val" id="cedear-kpi-market-val">$ 0,00</span>
+            <span class="kpi-sub" id="cedear-kpi-market-sub">Basado en cotización actual BYMA</span>
+          </div>
+          <div class="cedear-kpi-card glass-card">
+            <span class="kpi-label">Valuación de Registro (Libros)</span>
+            <span class="cedear-kpi-val" id="cedear-kpi-book-val">$ 0,00</span>
+            <span class="kpi-sub">Al momento del resumen procesado</span>
+          </div>
+          <div class="cedear-kpi-card glass-card">
+            <span class="kpi-label">Ganancia / Pérdida no Realizada</span>
+            <span class="cedear-kpi-val" id="cedear-kpi-pnl">$ 0,00</span>
+            <span class="kpi-sub" id="cedear-kpi-pnl-sub">P&L acumulado en cartera activa</span>
+          </div>
+        </div>
+
+        <!-- Active CEDEAR Holdings with Live Market Prices -->
+        <div class="section-title-row" style="margin-top: 1.5rem; margin-bottom: 0.75rem;">
+          <h3 class="section-title">Tenencias Activas en Cartera</h3>
+          <span class="section-hint">Cotizaciones en ARS por cada certificado</span>
+        </div>
+
+        <div class="table-responsive glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ticker BYMA</th>
+                <th>Especie / Nombre</th>
+                <th>Entidad Custodio</th>
+                <th style="text-align:right;">Cantidad</th>
+                <th style="text-align:right;">Precio Libro</th>
+                <th style="text-align:right;">Precio Mercado (Vivo)</th>
+                <th style="text-align:right;">Var. Diaria</th>
+                <th style="text-align:right;">Valuación Actual</th>
+                <th style="text-align:right;">P&L No Realizada</th>
+              </tr>
+            </thead>
+            <tbody id="cedears-holdings-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Historical Closed Trades & Realized PnL -->
+        <div class="section-title-row" style="margin-top: 2rem; margin-bottom: 0.75rem;">
+          <h3 class="section-title">Trades Cerrados & Rendimiento Histórico (P&L Realizada)</h3>
+          <span class="section-hint">Ganancia o pérdida neta cobrada en operaciones bursátiles liquidadas y finalizadas</span>
+        </div>
+
+        <div class="table-responsive glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ticker / Especie</th>
+                <th>Estado</th>
+                <th>Fecha Compra</th>
+                <th style="text-align:right;">Monto Invertido</th>
+                <th>Fecha Venta</th>
+                <th style="text-align:right;">Monto Cobrado</th>
+                <th style="text-align:right;">Ganancia / Pérdida Neta</th>
+                <th style="text-align:right;">Rendimiento %</th>
+              </tr>
+            </thead>
+            <tbody id="cedears-trades-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer Argentino -->
     <footer class="footer">
-      <div>
-        <span>Consolidador Financiero Personal v2.0</span>
+      <div class="footer-left">
+        <div class="escarapela-mini"></div>
+        <div>
+          <span class="footer-title">Consolidador Patrimonial Argentino • Edición 2026</span>
+          <p class="footer-sub">Diseñado para la operatoria y normativa del sistema financiero argentino</p>
+        </div>
       </div>
-      <div>
-        <span>Datos extraídos de resúmenes consolidados de Banco Galicia, Balanz Capital, Mercado Pago y Ualá</span>
+      <div class="footer-center">
+        <span>TC de Referencia MEP: <strong id="footer-mep-val">$ 1.480,46</strong></span>
+        <span class="footer-dot">•</span>
+        <span>Normativa BCRA / CNV</span>
+      </div>
+      <div class="footer-right">
+        <span>Titular: <strong>Alejandro Romagnoli</strong></span>
       </div>
     </footer>
 

@@ -12,6 +12,7 @@ import mimetypes
 
 from src.consolidator import PortfolioConsolidator
 from src.exporter import ExcelExporter
+from src.market_service import CedearPriceService
 
 PORT = 8050
 BASE_DIR = Path(__file__).resolve().parent
@@ -25,17 +26,28 @@ current_portfolio = consolidator.process()
 # Pre-generate Excel
 exporter.export(current_portfolio)
 
+cedear_service = CedearPriceService(cache_ttl_seconds=300)
+
 class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
     """Handles static files and financial REST API requests."""
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+        query = urllib.parse.parse_qs(parsed.query)
 
         if path == "/" or path == "/index.html":
             self._serve_file(WEB_DIR / "index.html", "text/html; charset=utf-8")
         elif path == "/api/data":
             self._serve_json(consolidator.to_dict(current_portfolio))
+        elif path == "/api/cedears":
+            tickers_param = query.get("tickers", [None])[0]
+            tickers = [t.strip().upper() for t in tickers_param.split(",")] if tickers_param else [
+                "IBIT", "VIST", "COIN", "ASML", "GOOGL", "ETHA", "HUT", "BITF", "OGZD"
+            ]
+            force = query.get("force", ["0"])[0] in ("1", "true", "True")
+            data = cedear_service.get_quotes(tickers=tickers, force_refresh=force)
+            self._serve_json(data)
         elif path == "/api/download-excel":
             excel_path = OUTPUT_DIR / "Patrimonio_Consolidado_Alejandro.xlsx"
             if excel_path.exists():
@@ -48,13 +60,19 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
                     self.wfile.write(f.read())
             else:
                 self.send_error(404, "Report not found")
-        elif path.startswith("/css/") or path.startswith("/js/"):
+        elif path.startswith("/css/") or path.startswith("/js/") or path.startswith("/img/") or path.startswith("/assets/"):
             clean_path = path.lstrip("/")
             target_file = WEB_DIR / clean_path
             mime_type, _ = mimetypes.guess_type(str(target_file))
             self._serve_file(target_file, mime_type or "text/plain")
         else:
-            self.send_error(404, "File not found")
+            clean_path = path.lstrip("/")
+            target_file = WEB_DIR / clean_path
+            if target_file.is_file() and target_file.resolve().is_relative_to(WEB_DIR.resolve()):
+                mime_type, _ = mimetypes.guess_type(str(target_file))
+                self._serve_file(target_file, mime_type or "application/octet-stream")
+            else:
+                self.send_error(404, "File not found")
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
